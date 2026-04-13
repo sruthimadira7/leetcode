@@ -25,9 +25,6 @@ class Solution:
             return False
 
         s_set = set(s)
-        print(s_set)
-        t_set = set(t)
-        print(t_set)
 
         for ch in s_set:
             if s.count(ch) != t.count(ch):
@@ -39,4 +36,3 @@ class Solution:
 s = Solution()
 print(s.isAnagram("anagram", "nagaram"))
 print(s.isAnagram("rat", "car"))
-# print(s.isAnagram("siva", "nisi"))
