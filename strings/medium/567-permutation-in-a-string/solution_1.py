@@ -32,14 +32,13 @@ class Solution:
 
         #  initialize pointers that keeps tract of the combination
         #  start and end
-        i = 0
-        j = n - 1
+        j = 0
 
         # iterate the string s2
         while j < m:
             # slice the string s2 
             #  based on the start and end points
-            slice_s2 = s2[i: j + 1]
+            slice_s2 = s2[j: j + n]
             # sort the slice
             sorted_slice_s2 = ''.join(sorted(slice_s2))
 
@@ -51,7 +50,6 @@ class Solution:
                 return True
             
             #  increment the pointers each time
-            i += 1
             j += 1
 
         # s1's permutations are not the substring of s2
