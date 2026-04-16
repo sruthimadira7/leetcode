@@ -50,7 +50,8 @@ class Solution:
                     # append the char max_freq number of times
                     for i in range(max_freq):
                         res += key
-
+                
+            
             # decrement max_freq by 1
             max_freq -= 1
 
@@ -63,3 +64,5 @@ print(s.frequencySort("Aabb"))
 
 
 # problem: 451-sort-characters-by-frequency
+# time complexity: O(n²)
+# space complexity: O(n)
