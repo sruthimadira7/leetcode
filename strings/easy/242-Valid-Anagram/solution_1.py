@@ -59,9 +59,7 @@ How would you adapt your solution to such a case?
 class Solution:
     def isAnagram(self, s: str, t: str) -> bool:
 
-        # Guard clause: anagrams must have the same length.
-        # Returning early avoids the cost of sorting entirely
-        # when the answer is obviously False.
+        # different lengths can never be anagrams
         if len(s) != len(t):
             return False
 
