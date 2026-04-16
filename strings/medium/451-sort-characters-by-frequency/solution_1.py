@@ -48,8 +48,7 @@ class Solution:
                 # check if the freq equals to max_freq
                 if s_char_freq[key] == max_freq:
                     # append the char max_freq number of times
-                    for i in range(max_freq):
-                        res += key
+                    res += key * max_freq
                 
             
             # decrement max_freq by 1
