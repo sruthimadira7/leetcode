@@ -41,13 +41,17 @@ class Solution:
         #  store the maximum frequency
         max_freq = max(s_char_freq.values())
 
-        # 
+        # check the condition max_freq greater than 'zero'
         while max_freq > 0:
+            # iterate the s_char_freq 
             for key in s_char_freq.keys():
+                # check if the freq equals to max_freq
                 if s_char_freq[key] == max_freq:
+                    # append the char max_freq number of times
                     for i in range(max_freq):
                         res += key
 
+            # decrement max_freq by 1
             max_freq -= 1
 
         return res
