@@ -1,4 +1,5 @@
 """
+205. Isomorphic Strings
 Given two strings s and t, determine if they are isomorphic.
 Two strings s and t are isomorphic if the characters in s can be replaced to get t.
 All occurrences of a character must be replaced with another character while preserving the order of characters. 
@@ -40,17 +41,20 @@ class Solution:
         #  store the length of any given string in a variable
         n = len(s)
         #  a hashmap to map the characters of two strings
-        mapping_s_to_t = {}
-        mapping_t_to_s = {}
+        s_char_map = {}
+        t_char_map = {}
 
         #  Iterate any one of the string
         for i in range(n):
-            if (s[i] in mapping_s_to_t and mapping_s_to_t[s[i]] != t[i]) or (
-                t[i] in mapping_t_to_s and mapping_t_to_s[t[i]] != s[i]):
+            if s[i] not in s_char_map:
+                if t[i] in t_char_map:
+                    return False
+                else:
+                    s_char_map[s[i]] = t[i]
+                    t_char_map[t[i]] = s[i]
+            
+            if s_char_map[s[i]] != t[i]:
                 return False
-
-            mapping_s_to_t[s[i]] = t[i]
-            mapping_t_to_s[t[i]] = s[i]
 
         return True
     
