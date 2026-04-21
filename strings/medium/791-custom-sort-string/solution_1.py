@@ -34,17 +34,29 @@ class Solution:
     def customSortString(self, order: str, s: str) -> str:
         res = ''
         
+        # initialzie a counter
+        # to store the s characters and their frequencies
         s_counter = {}
         
+        # iterate string s 
         for ch in s:
+            #  update s_counter with the character's frequencies
             s_counter[ch] = s_counter.get(ch, 0) + 1
 
+        # iterate string 'order'
         for ch in order:
+            # if the character is in s_counter
             if ch in s_counter:
+                # concatenate the character 
+                # those many number of times to the res string
                 res += ch * s_counter[ch]
+                # we don't that key any more delete it from s_counter
                 del s_counter[ch]
 
+        # iterate s_counter
         for key, val in s_counter.items():
+            # concatenate the rest of the characters
+            # those many number of times
             res += key * val
 
         return res
