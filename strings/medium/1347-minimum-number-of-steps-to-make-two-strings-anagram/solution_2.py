@@ -27,7 +27,6 @@ s and t consist of lowercase English letters only.
 """
 class Solution:
     def minSteps(self, s: str, t: str) -> int:
-        print(s, t)
         s_counter = {}
         t_counter = {}
         num_steps = 0
