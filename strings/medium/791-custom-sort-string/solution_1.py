@@ -42,11 +42,10 @@ class Solution:
         for ch in order:
             if ch in s_counter:
                 res += ch * s_counter[ch]
-                s_counter[ch] = 0
+                del s_counter[ch]
 
         for key, val in s_counter.items():
-            if val != 0:
-                res += key * val
+            res += key * val
 
         return res
 
