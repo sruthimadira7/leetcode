@@ -23,10 +23,10 @@ class Solution:
         left = 0
         right = len(s) - 1
 
+        
 
         
-                
-                
+
 
 s = Solution()
 print(s.validPalindrome("cbbcc")) # True
