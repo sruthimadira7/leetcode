@@ -16,87 +16,62 @@ s and t consist of lowercase English letters.
 Follow up: What if the inputs contain Unicode characters?
 How would you adapt your solution to such a case?
 """
-
 # ─────────────────────────────────────────────────────────────
 # APPROACH: Hash Map (Frequency Counter)
 #
 # Core idea:
 #   Two strings are anagrams if and only if every character
 #   appears the same number of times in both strings.
-#   We record the frequency of each character in s, then
-#   "consume" those counts while walking through t. If any
-#   character in t is missing from the map or has been fully
-#   consumed (count == 0), the strings are not anagrams.
+#   We build a frequency map for each string independently,
+#   then compare the two maps for equality.
 #
 # Algorithm:
-#   1. Early-exit: if lengths differ, they cannot be anagrams.
-#   2. Phase 1 — build a frequency map by iterating over s.
-#   3. Phase 2 — iterate over t, decrementing counts; return
-#      False the moment a character is absent or exhausted.
-#   4. If Phase 2 completes without returning False, every
-#      character balanced out → return True.
+#   1. Define a helper char_count(s) that iterates over a
+#      string and returns a dict mapping each character
+#      to the number of times it appears.
+#   2. Call char_count on both s and t.
+#   3. If the two dicts are equal, every character matches
+#      in frequency → return True, otherwise False.
 #
-# Follow-up — Unicode support:
-#   This solution handles Unicode automatically. Python dicts
-#   accept any hashable key, so Unicode characters are stored
-#   just like ASCII ones. No changes are needed.
-#
-# Time Complexity : O(n)
-#   - Phase 1 iterates over s once           → O(n)
-#   - Phase 2 iterates over t once           → O(n)
-#   - Each dict lookup / update is O(1) avg.
-#   - Overall: O(n), a strict improvement over the O(n log n)
-#     sorting approach.
-#
-# Space Complexity: O(k)  ≈  O(1) for lowercase-only input
-#   - The frequency map holds at most k distinct characters,
-#     where k is the size of the alphabet.
-#   - For the constrained input (lowercase a–z), k ≤ 26, so
-#     space is effectively O(1) — constant regardless of n.
-#   - For arbitrary Unicode, k can grow up to O(n) in the
-#     worst case (all characters distinct).
-# ─────────────────────────────────────────────────────────────
-
 class Solution:
     def isAnagram(self, s: str, t: str) -> bool:
 
-        # different lengths can never be anagrams
-        if len(s) != len(t):
-            return False
+        def char_count(s: str):
+            s_counter = {}
+            for ch in s:
+                if ch not in s_counter:
+                    s_counter[ch] = 0     # initialise key on first encounter
 
-        # freq_map[ch] = number of times ch still needs to be
-        # matched by t. Starts populated from s, then drained
-        # by t in Phase 2.
-        freq_map = {}
+                s_counter[ch] += 1        # increment frequency
 
-        # ── Phase 1: Build frequency map from s ───────────────
-        for ch in s:
-            # dict.get(key, default) safely returns 0 for keys
-            # that haven't been seen yet, avoiding a KeyError.
-            freq_map[ch] = freq_map.get(ch, 0) + 1
+            return s_counter
 
-        # ── Phase 2: Verify t against the frequency map ───────
-        for ch in t:
-            # Case A — ch never appeared in s at all.
-            # Case B — ch appeared in s but has already been
-            #          fully consumed (count reached 0), meaning
-            #          t contains more occurrences than s does.
-            # Either case disqualifies an anagram relationship.
-            if ch not in freq_map or freq_map[ch] == 0:
-                return False
-
-            # ch is present and still has remaining count.
-            # Consume one occurrence; if t is a true anagram
-            # every count will reach exactly 0 by the end.
-            freq_map[ch] -= 1
-
-        # Every character in t found a matching, unconsumed
-        # character in s. Since lengths are equal (checked
-        # upfront), all counts are now exactly 0 → valid anagram.
-        return True
+        # Equal dicts means identical character frequencies → anagram
+        return char_count(s) == char_count(t)
 
 
 # ── Quick smoke tests ──────────────────────────────────────────
 s = Solution()
 print(s.isAnagram("anagram", "nagaram"))   # Expected: True
 print(s.isAnagram("rat", "car"))           # Expected: False
+
+# Follow-up — Unicode support:
+#   This solution handles Unicode automatically. Python dicts
+#   accept any hashable key, so Unicode characters are stored
+#   just like ASCII ones. No changes are needed.
+#
+# Time Complexity : O(n)
+#   - char_count(s) iterates over s once     → O(n)
+#   - char_count(t) iterates over t once     → O(n)
+#   - Each dict lookup / update is O(1) avg.
+#   - Overall: O(n), a strict improvement over the O(n log n)
+#     sorting approach.
+#
+# Space Complexity: O(k)  ≈  O(1) for lowercase-only input
+#   - Each frequency map holds at most k distinct characters,
+#     where k is the size of the alphabet.
+#   - For the constrained input (lowercase a–z), k ≤ 26, so
+#     space is effectively O(1) — constant regardless of n.
+#   - For arbitrary Unicode, k can grow up to O(n) in the
+#     worst case (all characters distinct).
+# ─────────────────────────────────────────────────────────────
