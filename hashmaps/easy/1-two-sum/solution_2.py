@@ -28,27 +28,27 @@ Follow-up: Can you come up with an algorithm that is less than O(n2) time comple
 # APPROACH: Hash Map (Complement Lookup)
 #
 # Core idea:
-#   For every number in nums, its required partner is
-#   target - nums[i] (the complement / difference).
-#   Instead of searching the entire array for that partner
+#   For every number in nums, its complement
+#   or complementerence is target - nums[i].
+#   Instead of searching entire array for that complement
 #   with a second loop, we store each number and its index
 #   in a hash map as we go — turning the lookup into O(1).
 #
 # Algorithm:
-#   1. Initialise an empty diff_map to store each number
+#   1. Initialise an empty index_map to store each number
 #      and its index as we iterate.
-#   2. For each index i, compute diff = target - nums[i].
-#   3. If diff already exists in diff_map, we found the pair —
-#      return [diff_map[diff], i].
-#   4. Otherwise, store nums[i] → i in diff_map and move on.
+#   2. For each index i, compute complement = target - nums[i].
+#   3. If complement already exists in index_map, we found the pair —
+#      return [index_map[complement], i].
+#   4. Otherwise, store nums[i] → i in index_map and move on.
 #   5. If no pair is found after all iterations, return [].
 #
 class Solution:
     def twoSum(self, nums: list[int], target: int) -> list[int]:
 
-        # initialise a diff_map to store each number
+        # initialise a index_map to store each number
         # and its respective index as we iterate
-        diff_map = {}
+        index_map = {}
 
         # store the length of the given list
         n = len(nums)
@@ -57,16 +57,16 @@ class Solution:
         for i in range(n):
 
             # calculate the complement needed to reach target
-            diff = target - nums[i]
+            complement = target - nums[i]
 
             # if the complement was seen before, we have our pair
-            if diff in diff_map:
+            if complement in index_map:
 
-                # return the stored index of diff and the current index
-                return [diff_map[diff], i]
+                # return the stored index of complement and the current index
+                return [index_map[complement], i]
 
             # complement not found yet — store current number and its index
-            diff_map[nums[i]] = i
+            index_map[nums[i]] = i
 
         return []
 
@@ -82,7 +82,7 @@ print(s.twoSum([2, 7, 11, 15], 9))   # Expected: [0, 1]
 #     brute force nested loop approach.
 #
 # Space Complexity: O(n)
-#   - diff_map stores at most n key-value pairs.
+#   - index_map stores at most n key-value pairs.
 #   - In the worst case (pair found at the last two elements),
 #     the map grows to hold n-1 entries.
 # ─────────────────────────────────────────────────────────────
