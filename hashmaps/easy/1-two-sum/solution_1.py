@@ -34,7 +34,7 @@ Follow up: Can you come up with an algorithm that is less than O(n²) time compl
 #
 # Algorithm:
 #   1. Store the length of nums to avoid repeated len() calls.
-#   2. Phase 1 — outer loop iterates over each index i from 0 to n-1.
+#   2. Phase 1 — outer loop iterates over each index i from 0 to n-2.
 #   3. Phase 2 — inner loop iterates over each index j from i+1 to n-1,
 #      ensuring each pair is checked exactly once.
 #   4. If nums[i] + nums[j] equals target, return [i, j].
@@ -69,7 +69,7 @@ print(s.twoSum([3, 3], 6))           # Expected: [0, 1]
 
 # ─────────────────────────────────────────────────────────────
 # Time Complexity : O(n²)
-#   - Outer loop iterates over n elements            → O(n)
+#   - Outer loop iterates over n - 1 elements        → O(n)
 #   - Inner loop iterates over up to n-1 elements    → O(n)
 #   - Combined: O(n²) — every pair is checked once.
 #   - Total pairs checked: n(n-1)/2
