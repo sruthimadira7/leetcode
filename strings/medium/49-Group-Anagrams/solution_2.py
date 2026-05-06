@@ -91,4 +91,9 @@ print(s.groupAnagrams(["a"]))      # Expected: [["a"]]
 #   - ''.join() and dict lookup are both                  → O(m)
 #   - Overall: O(n * m log m), where m is the average word length.
 #
-# Space
+# Space Complexity: O(n * m)
+#   - anagrams holds every word across all buckets        → O(n * m)
+#   - anagrams_list holds the same words in output form   → O(n * m)
+#   - The canonical key per word is at most length m      → O(m)
+#   - Overall: O(n * m), dominated by the storage of all words.
+# ─────────────────────────────────────────────────────────────
