@@ -17,37 +17,94 @@ Constraints:
 t.length == s.length + 1
 s and t consist of lowercase English letters.
 """
+# ─────────────────────────────────────────────────────────────
+# APPROACH: Frequency Map (Claim and Consume)
+#
+# Core idea:
+#   Build a frequency map for s, then consume it character by
+#   character as we walk through t. Every character in t that
+#   has a matching "claim" in the map decrements that claim.
+#   The moment we encounter a character in t that has no claim
+#   left (either absent from the map or exhausted to zero),
+#   that character must be the extra one added to t.
+#
+# Algorithm:
+#   1. Early-exit if s is empty — t contains only the added
+#      character, so return t directly.
+#   2. Build s_counter by iterating over s, mapping each
+#      character to its total occurrence count.
+#   3. Iterate over each character ch in t:
+#        a. If ch is absent from s_counter or its count
+#           has been exhausted to 0, ch is the extra character
+#           — return it immediately.
+#        b. Otherwise decrement s_counter[ch] by 1 to
+#           consume one claim for this character.
+#
 class Solution:
     def findTheDifference(self, s: str, t: str) -> str:
 
-        if not s:
+        if not s:          # s is empty → t holds only the added character
             return t
-        
-        #  store the length of the given two strings
-        t_len = len(t)
+
         s_len = len(s)
+        t_len = len(t)
 
-        # s_char_freq_map 
-        s_char_freq_map = {}
+        s_counter = {}     # frequency map: char → remaining claim count
 
-        #  iterate the s string
+        # ── Pass 1 : build the complete frequency map for s ────
         for ch in s:
-            #  store all it's characters in s_char_freq_map
-            s_char_freq_map[ch] = s_char_freq_map.get(ch, 0) + 1
+            # .get(ch, 0) returns 0 on first encounter,
+            # then increments on every subsequent visit
+            s_counter[ch] = s_counter.get(ch, 0) + 1   # update frequency
 
-        #  iterate the t string
+        # ── Pass 2 : consume claims while scanning t ───────────
         for ch in t:
-            #  check if character  of t at the current index is present in s_char_freq_map or not 
-            #  Even if it is present sometimes, check it's frequency if it is 'zero'
-            #  return that character, since it is the extra character
-            if ch not in s_char_freq_map or s_char_freq_map[ch] == 0:
-                return ch
-            
-            # decrement each time, to indicate that we traversed that character already
-            s_char_freq_map[ch] -= 1
-    
+            # two conditions that identify the extra character:
+            #   - ch never appeared in s at all         → not in map
+            #   - ch appeared in s but all copies used  → count exhausted to 0
+            if ch not in s_counter or s_counter[ch] == 0:
+                return ch          # extra character found — return immediately
 
+            s_counter[ch] -= 1     # consume one claim for this character
+
+
+# ── Quick smoke tests ──────────────────────────────────────────
 s = Solution()
-print(s.findTheDifference("abcd", "abcde"))
-print(s.findTheDifference("", "y"))
-print(s.findTheDifference("ae", "aea"))
+print(s.findTheDifference("abcd", "abcde"))   # Expected: "e"
+print(s.findTheDifference("", "y"))           # Expected: "y"
+print(s.findTheDifference("ae", "aea"))       # Expected: "a"
+
+# Note — why decrement instead of delete?
+#   Decrementing to 0 rather than deleting the key lets the
+#   `s_counter[ch] == 0` check handle exhausted characters
+#   cleanly without a KeyError. Both approaches are correct;
+#   decrementing keeps the code to a single unified condition.
+#
+# Note — frequency map visualised for s = "ae", t = "aea"
+#   After Pass 1 → s_counter = {a:1, e:1}
+#
+#   Pass 2 scan:
+#   ch='a'  map={a:1, e:1}  'a' in map and count=1 > 0  → decrement → {a:0, e:1}
+#   ch='e'  map={a:0, e:1}  'e' in map and count=1 > 0  → decrement → {a:0, e:0}
+#   ch='a'  map={a:0, e:0}  'a' in map but count=0      → return 'a' ✓
+#
+# Note — how this compares to other approaches:
+#   Sort and compare : O(n log n) time, O(n) space  — previous solution
+#   This solution    : O(n)       time, O(k) space  — optimal for readability
+#   XOR trick        : O(n)       time, O(1) space  — most space-efficient
+#   Sum difference   : O(n)       time, O(1) space  — most concise
+#
+# problem: 389-find-the-difference
+#
+# Time Complexity : O(n)
+#   - Pass 1 iterates over s once to build the map      → O(n)
+#   - Pass 2 iterates over t once to find the answer    → O(n)
+#   - Every dict lookup, insertion, decrement is        → O(1)
+#   - Overall: O(n), a strict improvement over the
+#     O(n log n) sort-based approach.
+#
+# Space Complexity: O(k)
+#   - s_counter holds at most k distinct chars    → O(k)
+#   - s consists of lowercase English letters, k ≤ 26  → O(1)
+#   - Overall: O(k), effectively O(1) for fixed alphabets.
+# ─────────────────────────────────────────────────────────────

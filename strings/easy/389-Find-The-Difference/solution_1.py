@@ -17,35 +17,84 @@ Constraints:
 t.length == s.length + 1
 s and t consist of lowercase English letters.
 """
+# ─────────────────────────────────────────────────────────────
+# APPROACH: Sort and Compare
+#
+# Core idea:
+#   Once both strings are sorted, every character in s lines up
+#   with its counterpart in t at the same index. The extra
+#   character added to t is the first position where the two
+#   sorted strings diverge. If no divergence is found during
+#   the scan, the extra character must be at the very end of
+#   sorted_t — since t is always exactly one character longer.
+#
+# Algorithm:
+#   1. Early-exit if s is empty — t contains only the added
+#      character, so return t directly.
+#   2. Sort both s and t into sorted_s and sorted_t.
+#   3. Iterate index i from 0 to s_len - 1:
+#        - If sorted_s[i] != sorted_t[i], the added character
+#          has shifted everything rightward from this point —
+#          return sorted_t[i] immediately.
+#   4. If the loop completes without diverging, the added
+#      character sits at the very last position — return sorted_t[i].
+#
 class Solution:
     def findTheDifference(self, s: str, t: str) -> str:
 
-        if not s:
+        if not s:          # s is empty → t holds only the added character
             return t
-        
-        #  sort the given two strings
-        sorted_s = sorted(s)
-        sorted_t = sorted(t)
 
-        #  store the length of sorted_s
-        s_len = len(sorted_s)
-        # initialize a variables
+        sorted_s = sorted(s)     # sort s so characters align positionally
+        sorted_t = sorted(t)     # sort t so the extra char causes a detectable shift
+
+        s_len = len(sorted_s)    # only need to scan as far as s reaches
         i = 0
 
-        #  iterate any of the strings
+        # ── Scan both sorted strings in lockstep ───────────────
         while i < s_len:
-            #  check whether if characters at their respective indices are equal or not
+            # first mismatch means sorted_t[i] is the added character —
+            # it has nudged the original character at this position rightward
             if sorted_s[i] != sorted_t[i]:
-                # If not equal, return that particular character
-                return sorted_t[i]
-            
-            i += 1
-        
-        #  return the last character
-        return sorted_t[i]
-    
+                return sorted_t[i]     # added character found mid-string
 
+            i += 1
+
+        # loop exhausted without diverging → added character is at the tail
+        return sorted_t[i]     # i == s_len, which is the last index of sorted_t
+
+
+# ── Quick smoke tests ──────────────────────────────────────────
 s = Solution()
-print(s.findTheDifference("abcd", "abcde"))
-print(s.findTheDifference("", "y"))
-print(s.findTheDifference("ae", "aea"))
+print(s.findTheDifference("abcd", "abcde"))   # Expected: "e"
+print(s.findTheDifference("", "y"))           # Expected: "y"
+print(s.findTheDifference("ae", "aea"))       # Expected: "a"
+
+# Note — why does returning sorted_t[i] after the loop work?
+#   After the while loop, i == s_len, which is exactly one past
+#   the last index of sorted_s but the last valid index of sorted_t
+#   (since len(sorted_t) == s_len + 1). So sorted_t[i] is always
+#   the final character of sorted_t — the only position left unchecked.
+#
+# Note — sort and compare visualised for s = "ae", t = "aea"
+#   sorted_s = ['a', 'e']
+#   sorted_t = ['a', 'a', 'e']
+#   i=0  sorted_s[0]='a'  sorted_t[0]='a'  ✓  match
+#   i=1  sorted_s[1]='e'  sorted_t[1]='a'  ✗  mismatch → return 'a'
+#
+# Note — alternative approaches worth knowing:
+#   Frequency map  : build char counts for both, find the differing key → O(n) time, O(k) space
+#   XOR trick      : XOR all chars in s and t — duplicates cancel, extra char remains → O(n) time, O(1) space
+#   Sum difference : sum(ord) of t minus sum(ord) of s → chr of difference → O(n) time, O(1) space
+#
+# problem: 389-find-the-difference
+#
+# Time Complexity : O(n log n)
+#   - sorted(s) and sorted(t) each sort strings of length n    → O(n log n)
+#   - The while loop scans at most n characters                → O(n)
+#   - Overall: O(n log n), dominated by the sort step.
+#
+# Space Complexity: O(n)
+#   - sorted_s and sorted_t each store n and n+1 characters   → O(n)
+#   - Overall: O(n), used by the two sorted copies.
+# ─────────────────────────────────────────────────────────────
