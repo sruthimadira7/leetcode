@@ -22,57 +22,102 @@ Constraints:
 1 <= s.length, p.length <= 3 * 104
 s and p consist of lowercase English letters.
 """
+# ─────────────────────────────────────────────────────────────
+# APPROACH: Sliding Window (Fixed-Size) + Frequency Map
+#
+# Core idea:
+#   A window of exactly p_len characters slides across s one
+#   step at a time. At every position we maintain a live
+#   frequency map s_count for the current window. If s_count
+#   matches p_count at any position, the window is an anagram
+#   of p and its start index is recorded.
+#   Adding one character on the right and removing one on the
+#   left keeps each update O(1), making the overall scan O(n).
+#
+# Algorithm:
+#   1. Early-exit if s is shorter than p — no window can fit.
+#   2. Build p_count once using Counter(p).
+#   3. Slide index i from 0 to s_len - 1:
+#        a. Add s[i] to s_count (expand right edge of window).
+#        b. Once i >= p_len, the window has exceeded p_len chars —
+#           remove the character that just fell off the left edge
+#           s[i - p_len]. Delete its key entirely if its count
+#           drops to zero, keeping s_count lean for comparison.
+#        c. Compare s_count == p_count. If equal, the window
+#           starting at (i - p_len + 1) is an anagram — record it.
+#   4. Return anagrams_start_indices.
+#
 from collections import Counter
+
 class Solution:
     def findAnagrams(self, s: str, p: str) -> list[int]:
-        # store the length of the given two strings
+
         s_len = len(s)
         p_len = len(p)
 
-        #  check whether the length of the given string
-        #  greater than p or not
-        if s_len < p_len:
+        if s_len < p_len:          # no window of size p_len can fit inside s
             return []
 
-        #  construct the character frequency map for the string p
-        p_count = Counter(p)
-        # initialize the character frequency map for the string s
-        s_count = Counter()
+        p_count = Counter(p)       # fixed reference frequency map for p
+        s_count = Counter()        # live frequency map for the current window
 
-        # a list to store p's anagrams starting indices
-        anagrams_start_indices = []
+        anagrams_start_indices = []     # collects valid window start positions
 
-        #  iterate the given string s
         for i in range(s_len):
-            # update the character frequencies for each character
-            s_count[s[i]] = s_count.get(s[i], 0) + 1
 
-            # check the value of i each time
-            #  for every value of i
-            #  greater than or equal to p_len
+            # ── expand the right edge ──────────────────────────
+            # bring s[i] into the current window
+            s_count[s[i]] = s_count.get(s[i], 0) + 1    # add incoming character
+
+            # ── shrink the left edge (once window exceeds p_len) ──
             if i >= p_len:
-                #  at any given point of time,
-                #  in the s_count s's character frequency 
-                #  can contain only the number of characters of p's having
-                #  with the exact frequency
-                # delete the character that doesn't matter or unnecessary
+                # s[i - p_len] is the character that just fell off the left
                 if s_count[s[i - p_len]] == 1:
-                    del s_count[s[i - p_len]]
-                #  decrement the unnecessary frequency
+                    del s_count[s[i - p_len]]    # remove key entirely to keep maps comparable
                 else:
-                    s_count[s[i - p_len]] -= 1
+                    s_count[s[i - p_len]] -= 1   # decrement — character still present in window
 
-            #  check their frequency map are equal or not
+            # ── check for anagram match ────────────────────────
+            # window is exactly p_len wide when i >= p_len - 1
             if p_count == s_count:
-                # if it is great,
-                # insert the starting index
-                anagrams_start_indices.append(i - p_len + 1)
+                anagrams_start_indices.append(i - p_len + 1)   # record start index of this window
 
         return anagrams_start_indices
 
 
+# ── Quick smoke tests ──────────────────────────────────────────
 s = Solution()
-print(s.findAnagrams("cbaebabacd", "abc"))
+print(s.findAnagrams("cbaebabacd", "abc"))   # Expected: [0, 6]
+print(s.findAnagrams("abab", "ab"))          # Expected: [0, 1, 2]
+print(s.findAnagrams("aa", "bb"))            # Expected: []
 
-#  time complexity: O(n) n -> length of s
-#  space complexity: O(k) k -> number of characters in p
+# Note — why delete the key instead of setting it to 0?
+#   Counter and dict equality checks compare both keys and values.
+#   If s_count retains a key with value 0 that p_count doesn't have,
+#   the two maps will never compare equal even if all frequencies match.
+#   Deleting the key keeps s_count structurally identical to p_count
+#   whenever the window is a valid anagram.
+#
+# Note — sliding window visualised for s = "cbaebabacd", p = "abc"
+#   i=0  window="c"     s_count={c:1}           p_count={a:1,b:1,c:1}  ✗
+#   i=1  window="cb"    s_count={c:1,b:1}       p_count={a:1,b:1,c:1}  ✗
+#   i=2  window="cba"   s_count={c:1,b:1,a:1}   p_count={a:1,b:1,c:1}  ✓ → index 0
+#   i=3  window="bae"   s_count={b:1,a:1,e:1}   p_count={a:1,b:1,c:1}  ✗
+#   ...
+#   i=8  window="bac"   s_count={b:1,a:1,c:1}   p_count={a:1,b:1,c:1}  ✓ → index 6
+#
+# problem: 438-find-all-anagrams-in-a-string
+#
+# Time Complexity : O(n)
+#   - Building p_count scans p once                       → O(p_len)
+#   - The for loop scans s once                           → O(s_len)
+#   - Each add / delete / decrement is a O(1) dict op     → O(1)
+#   - Map comparison holds at most 26 keys (lowercase)    → O(1)
+#   - Overall: O(n), where n = s_len.
+#
+# Space Complexity: O(k)
+#   - p_count holds at most k distinct characters of p    → O(k)
+#   - s_count holds at most k distinct characters         → O(k)
+#   - For lowercase English letters, k ≤ 26              → O(1)
+#   - Overall: O(k), effectively O(1) for fixed alphabets.
+# ─────────────────────────────────────────────────────────────
