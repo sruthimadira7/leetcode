@@ -25,73 +25,103 @@ Constraints:
 0 <= strs[i].length <= 100
 strs[i] consists of lowercase English letters.
 """
+# ─────────────────────────────────────────────────────────────
+# APPROACH: Brute-Force (Pairwise Frequency Map Comparison)
+#
+# Core idea:
+#   Two strings are anagrams if and only if their character
+#   frequency maps are identical. For every word we build its
+#   frequency map, then compare it against every word that
+#   hasn't been claimed by a group yet, collecting all matches
+#   into one group. A visited set prevents a word from being
+#   placed into more than one group.
+#
+# Algorithm:
+#   1. Maintain a visited set to track words already assigned
+#      to a group.
+#   2. For each word at index i (skip if already visited):
+#        a. Build its frequency map curr_word_char_freq.
+#        b. Start a group curr_word_anagrams = [curr_word].
+#        c. Mark curr_word as visited.
+#        d. Compare against every later word at index j > i:
+#             - Skip if already visited.
+#             - Build word's frequency map.
+#             - If maps are equal, append to group and mark visited.
+#   3. Append the completed group to anagrams_list.
+#   4. Return anagrams_list.
+#
 class Solution:
     def groupAnagrams(self, strs: list[str]) -> list[list[str]]:
-        print(strs)
-        # store the length of the list 
-        strs_len = len(strs)
-        # stores all the possible group of anagrams
-        anagrams_list = []
 
+        strs_len = len(strs)          # total number of words to process
+        anagrams_list = []            # stores all completed anagram groups
+        visited = set()               # tracks words already assigned to a group
 
-        # iterate the list
         for i, curr_word in enumerate(strs):
-                
-            #  initialize a curr_word_char_freq_map {}
+
+            if i in visited:          # skip — this word already belongs to a group
+                continue
+
+            # build the frequency map for the current word
             curr_word_char_freq = {}
-            #  iterate each word
             for ch in curr_word:
-                #  update the curr_word_char_freq map
+                # .get(ch, 0) returns 0 on first encounter,
+                # then increments on every subsequent visit
                 curr_word_char_freq[ch] = curr_word_char_freq.get(ch, 0) + 1
-            
-            #  displays the curr_word_char_freq_map {}
-            print(f'The current word \'{curr_word}\' freq map: {curr_word_char_freq}')
-            # after creating the frequency map of the curr_word
-            #  it doesn't matter, we have an anagram for it or not,
-            # anyway it needs to be appended
-            curr_word_anagrams = [curr_word]
-            print(f'The current word anagrams initially: {curr_word_anagrams}')
 
-            # iterate the list 
+            curr_word_anagrams = [curr_word]     # every word is an anagram of itself
+            visited.add(i)                        # mark curr_word as claimed
+
+            # compare curr_word against every remaining word to the right
             for j in range(i + 1, strs_len):
-                    word = strs[j]
-                    #  displays the current word & the word to be compared
-                    print(f'The Current word and the word to be compared are: {curr_word} & {word}')
-                    # initialize a word_char_freq {}
-                    word_char_freq = {}
-                    #  iterate the word
-                    for ch in word:
-                        # update the word character frequenciess
-                        word_char_freq[ch] = word_char_freq.get(ch, 0) + 1
-                    
-                    #  display the word character frequencies
-                    print(f'The word \'{word}\' freq map: {word_char_freq}')
 
-                    # two strings are said to be anagrams
-                    # if they have same characters with same frequency
-                    # which means first criteria to be checked is their lengths,
-                    if len(curr_word_char_freq) == len(word_char_freq):
-                        # initialize a variable to indicate whether
-                        # the two words are being compared anagrams or not 
-                        are_anagrams = True
-                        #  iterate the curr_word_char_freq with .keys()
-                        for key in curr_word_char_freq.keys():
-                            #  check if any of the character frequencies differ
-                            #  they are not anagrams
-                            if curr_word_char_freq[key] != word_char_freq.get(key, 0):
-                                are_anagrams = False
-                                break
-                        
+                if j in visited:      # skip — already placed in an earlier group
+                    continue
+
+                word = strs[j]
+
+                # build the frequency map for the candidate word
+                word_char_freq = {}
+                for ch in word:
+                    word_char_freq[ch] = word_char_freq.get(ch, 0) + 1
+
+                # quick pre-check: different number of distinct chars → not anagrams
+                if len(curr_word_char_freq) == len(word_char_freq):
+
+                    are_anagrams = True
+                    for key in curr_word_char_freq.keys():
+                        # any frequency mismatch disqualifies the pair
+                        if curr_word_char_freq[key] != word_char_freq.get(key, 0):
+                            are_anagrams = False
+                            break
+
                     if are_anagrams:
-                        curr_word_anagrams.append(word)
-                                
-                    print(f'The current word anagrams are: {curr_word_anagrams}')
-            
-            anagrams_list.append(curr_word_anagrams)
-            print(f'The grouped anagrasm are: {anagrams_list}')
-            
-        # return anagrams_list
-        
-        
+                        curr_word_anagrams.append(word)   # add to current group
+                        visited.add(j)                    # mark word as claimed
+
+            anagrams_list.append(curr_word_anagrams)      # group is complete
+
+        return anagrams_list
+
+
+# ── Quick smoke tests ──────────────────────────────────────────
 s = Solution()
 print(s.groupAnagrams(["eat","tea","tan","ate","nat","bat"]))
+# Expected: [["eat","tea","ate"], ["tan","nat"], ["bat"]] (any order)
+print(s.groupAnagrams([""]))       # Expected: [[""]]
+print(s.groupAnagrams(["a"]))      # Expected: [["a"]]
+
+# problem: 49-group-anagrams
+#
+# Time Complexity : O(n² * m)
+#   - Outer loop runs n times                              → O(n)
+#   - Inner loop runs up to n times per outer iteration   → O(n)
+#   - Building each frequency map iterates over the word  → O(m)
+#   - Overall: O(n² * m), where m is the average word length.
+#
+# Space Complexity: O(n * m)
+#   - visited set holds at most n indices                 → O(n)
+#   - anagrams_list holds all n words across all groups   → O(n * m)
+#   - Two frequency maps held at a time, each size ≤ 26   → O(1)
+#   - Overall: O(n * m), dominated by the output list.
+# ─────────────────────────────────────────────────────────────
