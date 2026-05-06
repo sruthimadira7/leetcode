@@ -30,32 +30,96 @@ Constraints:
 t.length == s.length
 s and t consist of any valid ascii character.
 """
+# ─────────────────────────────────────────────────────────────
+# APPROACH: Brute-Force (Pairwise Map Scan)
+#
+# Core idea:
+#   Two strings are isomorphic if there exists a strict one-to-one
+#   mapping between their characters — every s[i] always maps to
+#   the same t[i], and no two different s-characters map to the
+#   same t-character. We build the mapping incrementally and
+#   before each insertion we scan the existing map to detect
+#   either of the two violation types.
+#
+# Two violation types that break isomorphism:
+#   Type 1 — many-to-one: a different s-char already maps to t[i]
+#             e.g. char_map has 'g' → 'd', now 'x' wants → 'd'
+#             detected by: val == t[i] and key != s[i]
+#   Type 2 — one-to-many: s[i] is already mapped to a different t-char
+#             e.g. char_map has 'g' → 'd', now 'g' wants → 'z'
+#             detected by: key == s[i] and val != t[i]
+#
+# Algorithm:
+#   1. Early-exit if len(s) != len(t) — unequal lengths can never
+#      be isomorphic.
+#   2. Iterate index i from 0 to n-1:
+#        a. Scan every (key, val) pair in char_map.
+#        b. If either violation type is found, return False.
+#        c. Record the mapping char_map[s[i]] = t[i].
+#   3. If no violation was found across all positions, return True.
+#
 class Solution:
     def isIsomorphic(self, s: str, t: str) -> bool:
 
-        # Check whether the length of the two strings same or not
-        #  If different, they can never be Isomorphs
-        if len(s) != len(t):
+        if len(s) != len(t):      # unequal lengths → can never be isomorphic
             return False
-        
-        #  store the length of any given string in a variable
-        n = len(s)
-        #  a hashmap to map the characters of two strings
-        char_map = {}
 
-        #  Iterate any one of the string
+        n = len(s)
+        char_map = {}             # maps each s-character to its t-character
+
         for i in range(n):
+
+            # scan all existing mappings before recording s[i] → t[i]
             for key, val in char_map.items():
+
+                # Type 1 — many-to-one violation:
+                #   a different s-char already claims t[i] as its target
+                # Type 2 — one-to-many violation:
+                #   s[i] is already mapped but to a different t-char
                 if val == t[i] and key != s[i] or val != t[i] and key == s[i]:
                     return False
-            
-            char_map[s[i]] = t[i]
 
-        return True
-    
+            char_map[s[i]] = t[i]     # safe to record — no violation found at position i
 
+        return True     # all positions passed both violation checks
+
+
+# ── Quick smoke tests ──────────────────────────────────────────
 s = Solution()
-print(s.isIsomorphic("egg", "add"))
-print(s.isIsomorphic("paper", "title"))
-print(s.isIsomorphic("paperssss", "titlesese"))
-print(s.isIsomorphic("f11", "a23"))
+print(s.isIsomorphic("egg", "add"))            # Expected: True
+print(s.isIsomorphic("paper", "title"))        # Expected: True
+print(s.isIsomorphic("paperssss", "titlesese")) # Expected: False
+print(s.isIsomorphic("f11", "a23"))            # Expected: False
+
+# Note — why scan the whole map instead of just checking char_map.get(s[i])?
+#   char_map.get(s[i]) catches Type 2 (one-to-many) instantly.
+#   But Type 1 (many-to-one) requires knowing whether t[i] is already
+#   someone else's target — which needs a full scan of values.
+#   A second reverse map (t_char → s_char) would catch both in O(1),
+#   making the overall solution O(n) instead of O(n²). See below.
+#
+# Optimised alternative — two hash maps (O(n)):
+#   s_to_t = {}    # s-char → t-char
+#   t_to_s = {}    # t-char → s-char
+#   for sc, tc in zip(s, t):
+#       if s_to_t.get(sc, tc) != tc or t_to_s.get(tc, sc) != sc:
+#           return False
+#       s_to_t[sc] = tc
+#       t_to_s[tc] = sc
+#   return True
+#
+# problem: 205-isomorphic-strings
+#
+# Time Complexity : O(n²)
+#   - The outer loop runs n times                              → O(n)
+#   - The inner scan iterates over char_map, which grows
+#     up to k distinct characters (k ≤ 26 for ASCII letters)  → O(k)
+#   - In the worst case k = n (all unique chars), making
+#     the inner scan O(n) per outer step                       → O(n²)
+#   - Overall: O(n²) worst case.
+#
+# Space Complexity: O(k)
+#   - char_map holds at most k distinct s-characters          → O(k)
+#   - For lowercase ASCII letters k ≤ 26                      → O(1)
+#   - Overall: O(k), effectively O(1) for fixed alphabets.
+# ─────────────────────────────────────────────────────────────

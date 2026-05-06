@@ -30,37 +30,104 @@ Constraints:
 t.length == s.length
 s and t consist of any valid ascii character.
 """
+# ─────────────────────────────────────────────────────────────
+# APPROACH: Optimised Two Hash Maps
+#
+# Core idea:
+#   Two strings are isomorphic if there is a strict one-to-one
+#   mapping between their characters — every s[i] always maps
+#   to the same t[i], and no two different s-characters map to
+#   the same t-character. Maintaining two maps simultaneously
+#   catches both violation types in O(1) per position:
+#
+# Two violation types that break isomorphism:
+#   Type 1 — one-to-many : s[i] is already mapped to a different t-char
+#             e.g. s_char_map has 'g' → 'd', now 'g' is seen with 'z'
+#             detected by: s_char_map[s[i]] != t[i]
+#   Type 2 — many-to-one : t[i] is already someone else's target
+#             e.g. t_char_map has 'd' → 'g', now 'x' wants → 'd'
+#             detected by: t[i] in t_char_map (when s[i] is new)
+#
+# Algorithm:
+#   1. Early-exit if len(s) != len(t) — unequal lengths can
+#      never be isomorphic.
+#   2. Iterate index i from 0 to n-1:
+#        a. If s[i] is new to s_char_map:
+#             - Check Type 2: if t[i] is already in t_char_map,
+#               another s-char owns it → return False.
+#             - Otherwise record both directions:
+#               s_char_map[s[i]] = t[i] and t_char_map[t[i]] = s[i].
+#        b. Check Type 1: if s_char_map[s[i]] != t[i], the existing
+#           mapping conflicts with the current position → return False.
+#   3. If no violation found, return True.
+#
 class Solution:
     def isIsomorphic(self, s: str, t: str) -> bool:
 
-        # Check whether the length of the two strings same or not
-        #  If different, they can never be Isomorphs
-        if len(s) != len(t):
+        if len(s) != len(t):      # unequal lengths → can never be isomorphic
             return False
-        
-        #  store the length of any given string in a variable
-        n = len(s)
-        #  a hashmap to map the characters of two strings
-        s_char_map = {}
-        t_char_map = {}
 
-        #  Iterate any one of the string
+        n = len(s)
+        s_char_map = {}     # forward map  : s-char → t-char
+        t_char_map = {}     # reverse map  : t-char → s-char
+
         for i in range(n):
-            if s[i] not in s_char_map:
+
+            if s[i] not in s_char_map:     # s[i] is seen for the first time
+
+                # Type 2 — many-to-one violation:
+                # t[i] is already claimed by a different s-character
                 if t[i] in t_char_map:
                     return False
-                else:
-                    s_char_map[s[i]] = t[i]
-                    t_char_map[t[i]] = s[i]
-            
+
+                # safe to record — register the mapping in both directions
+                s_char_map[s[i]] = t[i]     # forward : s-char → t-char
+                t_char_map[t[i]] = s[i]     # reverse : t-char → s-char
+
+            # Type 1 — one-to-many violation:
+            # s[i] was seen before but its recorded target differs from t[i]
             if s_char_map[s[i]] != t[i]:
                 return False
 
-        return True
-    
+        return True     # all positions passed both violation checks
 
+
+# ── Quick smoke tests ──────────────────────────────────────────
 s = Solution()
-print(s.isIsomorphic("egg", "add"))
-print(s.isIsomorphic("paper", "title"))
-print(s.isIsomorphic("paperssss", "titlesese"))
-print(s.isIsomorphic("f11", "a23"))
+print(s.isIsomorphic("egg", "add"))             # Expected: True
+print(s.isIsomorphic("paper", "title"))         # Expected: True
+print(s.isIsomorphic("paperssss", "titlesese")) # Expected: False
+print(s.isIsomorphic("f11", "a23"))             # Expected: False
+
+# Note — why two maps instead of one?
+#   A single forward map (s → t) catches Type 1 instantly but
+#   misses Type 2 entirely. Consider s = "ab", t = "aa":
+#     i=0 : s_char_map = {a:a} — no conflict yet
+#     i=1 : s_char_map has no entry for 'b', so it records b → a
+#           now both 'a' and 'b' map to 'a' — a silent many-to-one
+#           that the forward map never detects.
+#   The reverse map t_char_map catches this immediately at i=1
+#   because 'a' is already in t_char_map from i=0.
+#
+# Note — two maps visualised for s = "paper", t = "title"
+#   i=0  s[i]='p' t[i]='t'  maps: {p:t} | {t:p}  ✓
+#   i=1  s[i]='a' t[i]='i'  maps: {p:t,a:i} | {t:p,i:a}  ✓
+#   i=2  s[i]='p' t[i]='t'  s_char_map[p]=t == t[i] ✓
+#   i=3  s[i]='e' t[i]='l'  maps: {p:t,a:i,e:l} | {t:p,i:a,l:e}  ✓
+#   i=4  s[i]='r' t[i]='e'  maps: {p:t,a:i,e:l,r:e} | {t:p,i:a,l:e,e:r}  ✓
+#   → True
+#
+# problem: 205-isomorphic-strings
+#
+# Time Complexity : O(n)
+#   - The loop runs exactly n times                        → O(n)
+#   - Every dict lookup and insertion is                  → O(1)
+#   - Overall: O(n), a strict improvement over the
+#     O(n²) brute-force scan of the previous approach.
+#
+# Space Complexity: O(k)
+#   - s_char_map holds at most k distinct s-characters    → O(k)
+#   - t_char_map holds at most k distinct t-characters    → O(k)
+#   - For valid ASCII, k ≤ 128                            → O(1)
+#   - Overall: O(k), effectively O(1) for fixed alphabets.
+# ─────────────────────────────────────────────────────────────
