@@ -45,7 +45,8 @@ class Solution:
             current_area = width * current_height
             
             # Track the maximum area found so far
-            max_area = max(max_area, current_area)
+            if current_area > max_area:
+                max_area = current_area
             
             # Move the pointer at the shorter wall inward
             # This is the only direction with potential for area improvement
