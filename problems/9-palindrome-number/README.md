@@ -22,7 +22,7 @@
 ---
 
 1.  Initailize a variable named **reverted_x** to **zero.**
-2.  Use a **while loop** with condition x > reverted_x\*\*.
+2.  Use a **while loop** with condition **x > reverted_x**
 3.  Extract the **last digit of x** using **x % 10**
 4.  **Build the reversed number:**
 
