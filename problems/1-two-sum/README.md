@@ -1,6 +1,6 @@
 # Let me walk through my brute-force approach
 
-1. I'll use **two nested loops** - an **outer loop** that **fixes one number**,and an that **compares it with every number to its right**.
+1. I'll use **two nested loops** - an **outer loop** that **fixes one number**,and **an inner loop** that **compares it with every number to its right**.
    1. Why it works - "By starting j from i+1, we ensure we never use the same index twice"
 
 2. For **each pair of numbers**, I'll **calculate their sum**.
