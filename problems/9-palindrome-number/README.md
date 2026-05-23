@@ -21,24 +21,24 @@
 
 ---
 
-1.  Initailize a variable named **reverted_x** to **zero.**
-2.  Use a **while loop** with condition **x > reverted_x**
+1.  Initailize a variable named **reverse_x** to **zero.**
+2.  Use a **while loop** with condition **x > reverse_x**
 3.  Extract the **last digit of x** using **x % 10**
-4.  **Build the reversed number:**
+4.  **Build the reverse_x:**
 
-        reverted_num = reverted_num * 10 + x % 10
+        reverse_x = reverse_x * 10 + x % 10
 
 5.  **Remove the last digit from x:**
 
         x = x // 10
 
-6.  **Stop when we've processed half the digits (when x ≤ reverted_num)**
+6.  **Stop when we've processed half the digits (when x ≤ reverse_x)**
 
 ### Step 3: Compare Halves
 
 ---
 
-1. For **even-length** numbers: Check if x == reverted_num
-2. For **odd-length** numbers: Check if x == reverted_num // 10 (middle digit ignored)
+1. For **even-length** numbers: Check if x == reverse_x
+2. For **odd-length** numbers: Check if x == reverse_x // 10 (middle digit ignored)
 
 ---
