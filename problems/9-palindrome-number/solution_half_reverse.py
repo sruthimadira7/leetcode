@@ -23,16 +23,26 @@ Follow up: Could you solve it without converting the integer to a string?
 """
 class Solution:
     def isPalindrome(self, x: int) -> bool:
-        if x < 0 or ( x % 10 == 0 and x != 0):
+        # Condition 1: Negative numbers can't be palindromes (they have a "-" sign)
+        # Condition 2: Numbers ending with 0 can't be palindromes (except 0 itself)
+        if x < 0 or (x % 10 == 0 and x != 0):
             return False
-        
-        reverted_number = 0
 
-        while x > reverted_number:
-            reverted_number = reverted_number * 10 + x % 10
-            x //= 10
+        #  initialize reverse_x to "zero"
+        reverse_x = 0
 
-        return x == reverted_number or x == reverted_number // 10
+        # Keep reversing the second half of x until 
+        # we've reversed half the digits
+        while x > reverse_x:
+            # Extract the last digit of x and add to reversed number
+            #  build the reverted number
+            reverse_x = reverse_x * 10 + x % 10
+            # Remove the last digit from x
+            x = x // 10
+
+        # For even-length numbers (like 1221): x == reverse_x
+        # For odd-length numbers x == reverse_x // 10
+        return x == reverse_x or x == reverse_x // 10
 
 
 s = Solution()
