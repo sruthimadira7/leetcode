@@ -10,6 +10,9 @@
 
 ## How should I approach this ?
 
+Core Idea : Reverse only the second half of the number and compare it with the first half.
+This approach avoids string conversion overhead and potential integer overflow from fully reversing large numbers
+
 ### Step 1: Check Edge Cases
 
 ---
