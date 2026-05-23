@@ -21,26 +21,39 @@ n == height.length
 """
 class Solution:
     def maxArea(self, height: list[int]) -> int:
-        #  initialize two pointers at ends of the array
+        """
+        Find two lines that form a container with the most water.
+        
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+        
+        Args:
+            height: List of integers representing line heights at each index
+            
+        Returns:
+            Integer representing the maximum area of water that can be contained
+        """
+        max_area = 0
         left = 0
         right = len(height) - 1
-        #  initialzie max_area to 'zero' 
-        max_area = 0
-
-        #  Check the condition whether the left is less than right or not
+        
+        # Two-pointer approach: start from both ends
         while left < right:
-            #  calculate width 
+            # Calculate dimensions of current container
             width = right - left
-            #  update the max_area for each iteration
-            max_area = max(max_area, min(height[left], height[right]) * width)
-
-            #  if height[left] less than height[right]
-            #  increment left by 1
+            current_height = min(height[left], height[right])
+            current_area = width * current_height
+            
+            # Track the maximum area found so far
+            max_area = max(max_area, current_area)
+            
+            # Move the pointer at the shorter wall inward
+            # This is the only direction with potential for area improvement
             if height[left] <= height[right]:
                 left += 1
             else:
                 right -= 1
-
+        
         return max_area
 
 s = Solution()
