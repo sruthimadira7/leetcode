@@ -52,8 +52,10 @@ class Solution:
             # j starts from i+1 to avoid duplicates and self-pairing
             for j in range(i + 1, n):
 
-                # check if the two numbers at indices i and j sum to target
-                if nums[i] + nums[j] == target:
+                # check if the two numbers at indices i and j sum up to target
+                # calculate the complement target - nums[i]
+                #  if this equals to nums[j]
+                if nums[j] == target - nums[i]:
 
                     # pair found — return their indices
                     return [i, j]
