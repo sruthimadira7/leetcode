@@ -36,8 +36,8 @@ Constraints:
 class Solution:
     def intersection(self, nums1: list[int], nums2: list[int]) -> list[int]:
 
-        # initialise an empty list to store the intersection elements
-        res = []
+        # initialise an empty set to store the intersection elements
+        res = set()
 
         # convert nums1 to a set — removes duplicates, O(1) lookups
         nums1_set = set(nums1)
@@ -47,9 +47,9 @@ class Solution:
 
             # if the element exists in nums1_set, it's part of the intersection
             if num in nums1_set:
-                res.append(num)
+                res.add(num)
 
-        return res
+        return list(res)
 
 
 # ── Quick smoke tests ──────────────────────────────────────────
