@@ -35,7 +35,7 @@ class Solution:
         r = len(strs) - 1
 
         # define a set of vowels for O(1) lookup
-        vowels_set = {"a", "e", "i", "o", "u"}
+        vowels_set = {"a", "e", "i", "o", "u", "A", "E","I", "O", "U"}
 
         while l < r:
             # if both pointers point to vowels, swap them
@@ -56,3 +56,4 @@ class Solution:
 s = Solution()
 print(s.reverseVowels("hello"))
 print(s.reverseVowels("leetcode"))
+print(s.reverseVowels("IceCreAm"))
