@@ -22,16 +22,24 @@ Constraints:
 """
 class Solution:
     def maxSubArray(self, nums: list[int]) -> int:
+        # initialize max_sum to negative infinity
         max_sum = float("-inf")
+        # initialize sum to zero
         sum = 0
 
+        # iterate the given array
         for num in nums:
+            #  if the sum is less than zero
             if sum < 0:
+                #  assign sum to the current_number
                 sum = num
             else:
+                #  else keep adding the number to sum
                 sum += num
-                
+
+            # check the condition if sum is greater than max_sum
             if sum > max_sum:
+                # if it is greater assign sum to max_sum
                 max_sum = sum
 
         return max_sum
