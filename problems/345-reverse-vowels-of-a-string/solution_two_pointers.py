@@ -26,25 +26,33 @@ Follow-up: Do it in a single pass with O(1) extra space.
 How would you generalize the solution so the "which characters get reversed" rule is a parameter rather than hardcoded vowels?
 """
 class Solution:
-    def reverse_vowels(strs):
-        strs_list = list(strs)
-        print(strs_list)
-        left = 0
-        right = len(strs_list) - 1
+    def reverseVowels(self, s: str) -> str:
+        # convert string to list to allow in-place swapping
+        strs = list(s)
+
+        # initialize left and right pointers at both ends of the array
+        l = 0
+        r = len(strs) - 1
+
+        # define a set of vowels for O(1) lookup
         vowels_set = {"a", "e", "i", "o", "u"}
 
-        while left < right:
-            if strs_list[left] in vowels_set and strs_list[right] in vowels_set:
-                strs_list[left], strs_list[right] = strs_list[right], strs_list[left]
-                left += 1
-                right -= 1
-            elif strs[left] not in vowels_set:
-                left += 1
+        while l < r:
+            # if both pointers point to vowels, swap them
+            if strs[l] in vowels_set and strs[r] in vowels_set:
+                strs[l], strs[r] = strs[r], strs[l]
+                l += 1
+                r -= 1
+            # if left pointer is not a vowel, move it forward
+            elif s[l] not in vowels_set:
+                l += 1
+            # if right pointer is not a vowel, move it backward
             else:
-                right -= 1
+                r -= 1
 
-        return "".join(strs_list)
+        # join the list back into a string and return
+        return "".join(strs)
     
 s = Solution()
-print(s.reverse_vowels("hello"))
-print(s.reverse_vowels("leetcode"))
+print(s.reverseVowels("hello"))
+print(s.reverseVowels("leetcode"))
