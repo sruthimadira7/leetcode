@@ -26,16 +26,13 @@ class Solution:
         max_sum = float("-inf")
 
         # using outer loop fix a number
-        for i in range(len(nums) - 1):
-            # initialize sum to the number at index i
-            sum = nums[i]
-            # using the inner loop iterate through the remaining array
-            for j in range(i + 1, len(nums)):
-                print(f"sum: {sum}")
+        for i in range(len(nums)):
+            # initialize sum to the zero
+            sum = 0
+            # using the inner loop iterate through the  array i to till the end
+            for j in range(i, len(nums)):
                 # keep adding each num to the sum
                 sum += nums[j]
-                print(f"i: {i}, j: {i}, nums[j]:{nums[j]}, sum:{sum}")
-                # for each iteration check if the sum is greater than max_sum
                 if sum > max_sum:
                     # if it is assign sum to max_sum
                     max_sum = sum
