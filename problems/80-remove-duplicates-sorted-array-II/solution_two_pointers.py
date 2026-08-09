@@ -79,4 +79,4 @@ class Solution:
 s = Solution()
 print(s.removeDuplicates([1,1,1,2,2,3]))
 
-# problem: 80-remove-duplicates-from-sorted-array-II
+# problem: 80-remove-duplicates-sorted-array-II
