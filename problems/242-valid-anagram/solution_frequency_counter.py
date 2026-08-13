@@ -43,14 +43,17 @@ class Solution:
         if len(s) != len(t):
             return False
 
-        # initialise a frequency map to store each character
+        # initialize a frequency map to store each character
         # and the number of times it appears in s
         s_char_freq = {}
 
         # Phase 1 — build frequency map from s
         for ch in s:
+            #  if the character is not present in s_char_freq initialize its frequency to '0'
+            if ch not in s_char_freq:
+                s_char_freq[ch] = 0
             # increment count for ch, defaulting to 0 on first encounter
-            s_char_freq[ch] = s_char_freq.get(ch, 0) + 1
+            s_char_freq[ch] += 1
 
         # Phase 2 — verify t against the frequency map
         for ch in t:
