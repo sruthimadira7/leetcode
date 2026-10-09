@@ -1,3 +1,3 @@
-# leetcode
+# Leetcode
 
-A repository that gives me a report of solving leetcode problems
+LeetCode solutions in Python, grouped by pattern, with notes on each approach.
